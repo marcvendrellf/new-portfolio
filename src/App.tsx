@@ -1,7 +1,7 @@
-import Navbar from './components/Navbar.tsx'
+import Header from './components/Header.tsx'
 
 function App() {
-  return <Navbar />
+  return <Header section="AI Stack" />
 }
 
 export default App

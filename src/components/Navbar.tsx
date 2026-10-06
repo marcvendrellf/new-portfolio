@@ -9,7 +9,7 @@ const links = [
 
 function Navbar() {
   return (
-    <nav className="flex gap-6">
+    <nav aria-label="Main" className="flex gap-6">
       {links.map((link) => (
         <a key={link.href} className="whitespace-nowrap" href={link.href}>
           {link.label}
