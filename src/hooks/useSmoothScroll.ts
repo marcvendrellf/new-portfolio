@@ -11,7 +11,6 @@ function useSmoothScroll() {
     }
 
     const lenis = new Lenis({
-      // Each frame moves 10% of the remaining distance. https://github.com/darkroomengineering/lenis
       lerp: 0.1,
       autoRaf: true,
     })
