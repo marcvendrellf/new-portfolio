@@ -5,6 +5,15 @@
   --color-ink: #20201e;
   --text-body: 13px;
   --text-body--line-height: 20px;
+  --font-title: "Host Grotesk", sans-serif;
+  --text-title: 88px;
+  --text-title--line-height: 92px;
+  --text-title--letter-spacing: -0.03em;
+  --text-title--font-weight: 500;
+}
+
+@utility page-grid {
+  @apply grid grid-cols-12 gap-x-6 px-6;
 }
 
 @layer base {

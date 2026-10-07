@@ -1,7 +1,7 @@
-import Header from './components/Header.tsx'
+import AiStackPage from './pages/AiStackPage.tsx'
 
 function App() {
-  return <Header section="AI Stack" />
+  return <AiStackPage />
 }
 
 export default App
