@@ -1,3 +1,4 @@
+import CopyButton from '../components/CopyButton.tsx'
 import Header from '../components/Header.tsx'
 import ListRow from '../components/ListRow.tsx'
 import ListSection from '../components/ListSection.tsx'
@@ -18,16 +19,23 @@ function ContactPage() {
         </div>
         <div className="col-start-7 col-span-6 -ml-3 mr-10">
           <ListSection title={contact.linksTitle}>
-            {contact.links.map((link) => (
-              <ListRow
-                key={link.url}
-                href={link.url}
-                target={link.url.startsWith('https://') ? '_blank' : undefined}
-              >
+            <ListRow
+              href={`mailto:${contact.email.address}`}
+              action={<CopyButton text={contact.email.address} />}
+            >
+              <RowCells
+                name={contact.email.name}
+                kind=""
+                detail={contact.email.address}
+                arrow="↗"
+              />
+            </ListRow>
+            {contact.profiles.map((profile) => (
+              <ListRow key={profile.url} href={profile.url} target="_blank">
                 <RowCells
-                  name={link.name}
+                  name={profile.name}
                   kind=""
-                  detail={link.detail}
+                  detail={profile.detail}
                   arrow="↗"
                 />
               </ListRow>
