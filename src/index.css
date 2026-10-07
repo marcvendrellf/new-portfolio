@@ -11,6 +11,10 @@
   --text-title--line-height: 92px;
   --text-title--letter-spacing: -0.03em;
   --text-title--font-weight: 500;
+  --text-hero: 160px;
+  --text-hero--line-height: 154px;
+  --text-hero--letter-spacing: -0.03em;
+  --text-hero--font-weight: 500;
 }
 
 @utility page-grid {
