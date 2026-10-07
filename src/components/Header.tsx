@@ -6,13 +6,13 @@ type HeaderProps = {
 
 function Header({ section }: HeaderProps) {
   return (
-    <header className="page-grid pt-[38px]">
-      <nav aria-label="Breadcrumb" className="col-span-6 flex gap-2 whitespace-nowrap">
+    <header className="page-grid sticky top-0 z-10 bg-paper pt-9.5">
+      <nav aria-label="Breadcrumb" className="col-span-3 flex gap-2 whitespace-nowrap">
         <a href="/">Marc Vendrell</a>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{section}</span>
       </nav>
-      <div className="col-start-7 col-span-6">
+      <div className="col-start-4 col-span-6 justify-self-center">
         <Navbar />
       </div>
     </header>

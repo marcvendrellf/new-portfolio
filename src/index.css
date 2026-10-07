@@ -3,6 +3,7 @@
 @theme {
   --font-sans: Inter, sans-serif;
   --color-ink: #20201e;
+  --color-paper: #ffffff;
   --text-body: 13px;
   --text-body--line-height: 20px;
   --font-title: "Host Grotesk", sans-serif;
@@ -17,9 +18,14 @@
 }
 
 @layer base {
+  html {
+    overscroll-behavior: none;
+  }
+
   body {
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
     color: var(--color-ink);
+    background-color: var(--color-paper);
   }
 }
