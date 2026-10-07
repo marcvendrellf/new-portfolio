@@ -1,18 +1,11 @@
-const links = [
-  { label: 'Projects', href: '/projects' },
-  { label: 'Hackathons', href: '/hackathons' },
-  { label: 'About', href: '/about' },
-  { label: 'AI Stack', href: '/ai-stack' },
-  { label: 'Directory', href: '/directory' },
-  { label: 'Contact', href: '/contact' },
-]
+import { sections } from '../content/sections.ts'
 
 function Navbar() {
   return (
     <nav aria-label="Main" className="flex gap-6">
-      {links.map((link) => (
-        <a key={link.href} className="whitespace-nowrap" href={link.href}>
-          {link.label}
+      {Object.values(sections).map((section) => (
+        <a key={section.href} className="whitespace-nowrap" href={section.href}>
+          {section.label}
         </a>
       ))}
     </nav>
