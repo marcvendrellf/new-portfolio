@@ -1,15 +1,28 @@
 import type { ReactNode } from 'react'
 
 type ListRowProps = {
-  href: string
+  href?: string
+  target?: '_blank'
   children: ReactNode
 }
 
-function ListRow({ href, children }: ListRowProps) {
+const rowClassName = 'flex h-8 items-center gap-4 border-b border-ink'
+
+function ListRow({ href, target, children }: ListRowProps) {
+  if (href === undefined) {
+    return (
+      <li>
+        <div className={rowClassName}>{children}</div>
+      </li>
+    )
+  }
+
   return (
-    <a href={href} className="flex h-8 items-center gap-4 border-b border-ink">
-      {children}
-    </a>
+    <li>
+      <a href={href} target={target} className={rowClassName}>
+        {children}
+      </a>
+    </li>
   )
 }
 
