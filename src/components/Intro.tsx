@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
+import { intro } from '../content/intro.ts'
 import {
   bracketGap,
   bracketState,
   buildEvents,
+  dotState,
   ease,
   progress,
   timing,
@@ -30,15 +32,23 @@ function setText(element: HTMLElement, text: string) {
   }
 }
 
-const part = 'absolute top-0 left-0 whitespace-pre opacity-0'
+const big = 'absolute top-0 left-0 whitespace-pre font-title text-title opacity-0'
+const medium = 'absolute top-0 left-0 whitespace-pre text-[20px]/7 opacity-0'
+const corner = 'absolute whitespace-pre opacity-0'
 
-// One copy of the brackets and the phrases. The order of the spans matches getParts.
+// One copy of everything that the sweep changes from white on ink to ink on white.
 const copyMarkup = (
   <>
-    <span className={part}>[</span>
-    <span className={part}>]</span>
-    <span className={part} />
-    <span className={part} />
+    <span data-part="left" className={big}>[</span>
+    <span data-part="right" className={big}>]</span>
+    <span data-part="word" className={big} />
+    <span data-part="oldWord" className={big} />
+    <span data-part="caption" className={medium}>{intro.greetingCaption}</span>
+    <span data-part="role" className={medium}>{intro.role}</span>
+    <span data-part="topLeft" className={`${corner} top-6 left-6`}>{intro.topLeft}</span>
+    <span data-part="topRight" className={`${corner} top-6 right-6`}>{intro.topRight}</span>
+    <span data-part="bottomLeft" className={`${corner} bottom-6 left-6`}>{intro.bottomLeft}</span>
+    <span data-part="clock" className={`${corner} right-6 bottom-6`} />
   </>
 )
 
@@ -47,11 +57,31 @@ type Parts = {
   right: HTMLElement
   word: HTMLElement
   oldWord: HTMLElement
+  caption: HTMLElement
+  role: HTMLElement
+  corners: HTMLElement[]
+  clock: HTMLElement
 }
 
 function getParts(copy: HTMLElement): Parts {
-  const [left, right, word, oldWord] = Array.from(copy.children) as HTMLElement[]
-  return { left, right, word, oldWord }
+  const get = (name: string) => {
+    const element = copy.querySelector<HTMLElement>(`[data-part="${name}"]`)
+    if (!element) {
+      throw new Error(`The intro has no ${name} part.`)
+    }
+    return element
+  }
+
+  return {
+    left: get('left'),
+    right: get('right'),
+    word: get('word'),
+    oldWord: get('oldWord'),
+    caption: get('caption'),
+    role: get('role'),
+    corners: ['topLeft', 'topRight', 'bottomLeft', 'clock'].map(get),
+    clock: get('clock'),
+  }
 }
 
 function Intro() {
@@ -71,6 +101,7 @@ function Intro() {
     sessionStorage.setItem(storageKey, 'yes')
     const inkParts = getParts(ink)
     const paperParts = getParts(paper)
+    const dots = Array.from(ink.querySelectorAll<HTMLElement>('[data-part="dot"]'))
     let frameId = 0
     let stopped = false
 
@@ -82,7 +113,13 @@ function Intro() {
         word.textContent = text
         return word.offsetWidth
       })
-      const nameStart = events[events.length - 1].time
+      const timeOf = (text: string) => events.find((event) => event.text === text)?.time ?? 0
+      const nameStart = timeOf(intro.name)
+      const captionStart = timeOf(intro.greeting) + timing.captionDelay
+      const leadStart = timeOf(intro.lead)
+      const roleStart = nameStart + timing.role
+      const captionWidth = inkParts.caption.offsetWidth
+      const roleWidth = inkParts.role.offsetWidth
       const afterName = (range: number[]) => range.map((offset) => nameStart + offset)
       const [sweepStart, sweepEnd] = afterName(timing.sweep)
       const [nameOutStart, nameOutEnd] = afterName(timing.nameOut)
@@ -112,6 +149,14 @@ function Intro() {
           newOpacity = progress(t, middle, state.last.time + timing.fade, ease.fade)
         }
 
+        // Small texts rise 8 px and fade in. The caption fades out when the lead phrase starts.
+        const appear = (start: number) => progress(t, start, start + timing.smallIn, ease.open)
+        const captionOut = progress(t, leadStart, leadStart + 0.2, ease.fade)
+        const roleWords = Math.max(0, Math.floor((t - roleStart) / timing.roleStep) + 1)
+        const roleText = intro.role.split(' ').slice(0, roleWords).join(' ')
+        const below = top + lineHeight + 20
+        const clockText = new Date().toLocaleTimeString('en-GB', { timeZone: 'Europe/Madrid' })
+
         const drawCopy = (copy: Parts, opacity: number) => {
           place(copy.left, centerX - state.frame / 2 - gap - bracketWidth, top, bracketOpacity * opacity)
           place(copy.right, centerX + state.frame / 2 + gap, top, bracketOpacity * opacity)
@@ -119,9 +164,30 @@ function Intro() {
           place(copy.word, centerX - state.center / 2, top, newOpacity * opacity)
           setText(copy.oldWord, oldOpacity > 0 ? state.previous : '')
           place(copy.oldWord, centerX - state.previousWidth / 2, top, oldOpacity * opacity)
+
+          const caption = appear(captionStart)
+          place(copy.caption, centerX - captionWidth / 2, below + 8 * (1 - caption), 0.5 * caption * (1 - captionOut) * opacity)
+          const role = appear(roleStart)
+          setText(copy.role, roleText)
+          place(copy.role, centerX - roleWidth / 2, below + 8 * (1 - role), role * opacity)
+
+          // CSS places the corner texts, so only their rise and opacity change here.
+          const corners = appear(timing.cornersIn)
+          setText(copy.clock, clockText)
+          for (const element of copy.corners) {
+            element.style.transform = `translateY(${8 * (1 - corners)}px)`
+            element.style.opacity = String(0.5 * corners * opacity)
+          }
         }
         drawCopy(inkParts, 1)
         drawCopy(paperParts, 1 - progress(t, nameOutStart, nameOutEnd, ease.fade))
+
+        // The squares show only on ink. The sweep covers them.
+        dots.forEach((dot, index) => {
+          const spot = dotState(index, t, width, height)
+          dot.style.transform = `translate(${spot.x}px, ${spot.y}px)`
+          dot.style.opacity = spot.visible ? '1' : '0'
+        })
 
         // The sweep: a white bracket on its side rises from the bottom. The paper copy shows
         // under its edge, and its two arms reach up at the sides of the screen.
@@ -165,10 +231,12 @@ function Intro() {
     <div
       ref={overlayRef}
       aria-hidden="true"
-      className="fixed inset-0 z-50 overflow-hidden font-title text-title"
+      className="fixed inset-0 z-50 overflow-hidden"
     >
       <div ref={inkRef} className="absolute inset-0 bg-ink text-paper">
         {copyMarkup}
+        <span data-part="dot" className="absolute top-0 left-0 size-2.5 bg-paper opacity-0" />
+        <span data-part="dot" className="absolute top-0 left-0 size-2.5 bg-paper opacity-0" />
       </div>
       <div
         ref={paperRef}

@@ -3,12 +3,18 @@ import { intro } from '../content/intro.ts'
 // Timing in seconds. Edit these to change the rhythm.
 export const timing = {
   bracketsIn: 0.3, // the empty brackets fade in
+  cornersIn: 0.2, // the corner texts start to appear
+  dotsFrom: 0.4, // the flickering squares start
+  smallIn: 0.35, // a small text rises 8 px and fades in
+  captionDelay: 0.15, // the caption appears this long after the greeting is complete
   wordStep: 0.35, // one new word every 350 ms
   jump: 0.45, // one bracket jump
   glide: 0.6, // the text glides to the centre, slower than the brackets
   bracketLag: 0.5, // when the text gets shorter, the brackets close this much later
   fade: 0.4, // a phrase fades out in the first 40%, and the next one fades in after it
   // Seconds after the name starts:
+  role: 0.45, // the role appears under the name, one word at a time
+  roleStep: 0.12,
   sweep: [1.6, 2.35], // a white bracket rises from the bottom and covers the ink
   nameOut: [2.7, 3.05], // the name on white fades out
   leave: [3.15, 3.75], // the white intro fades out and shows Home under it
@@ -96,6 +102,7 @@ export const ease = {
   glide: cubicBezier(0.25, 0.8, 0.3, 1), // text: a softer start, so it trails the brackets
   fade: cubicBezier(0.4, 0, 0.2, 1),
   move: cubicBezier(0.65, 0, 0.35, 1), // sweep: a gentle start and a gentle stop
+  open: cubicBezier(0.16, 1, 0.3, 1), // small texts: a fast start and a soft stop
 }
 
 // Progress from 0 to 1 between `start` and `end`, shaped by a curve.
@@ -140,4 +147,28 @@ export function bracketState(events: IntroEvent[], t: number): BracketState {
   }
 
   return state
+}
+
+// A number from 0 to 1 that looks random, but is always the same for the same seed.
+function hash(seed: number) {
+  const value = Math.sin(seed * 127.1 + 311.7) * 43758.5453
+  return value - Math.floor(value)
+}
+
+// A flickering square. It jumps to a new place 6 times a second, on a 24 px grid,
+// away from the text in the middle of the screen.
+export function dotState(index: number, t: number, width: number, height: number) {
+  const step = Math.floor(t * 6)
+  const seed = step * 5 + index * 31
+  const x = 0.06 * width + hash(seed) * 0.88 * width
+  let y = 0.08 * height + hash(seed + 0.37) * 0.84 * height
+  if (Math.abs(y - height / 2) < 110 && Math.abs(x - width / 2) < 440) {
+    y += y < height / 2 ? -160 : 160
+  }
+
+  return {
+    visible: t >= timing.dotsFrom && hash(step * 3 + index * 17) > 0.2,
+    x: Math.round(x / 24) * 24,
+    y: Math.round(y / 24) * 24,
+  }
 }
