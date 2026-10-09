@@ -8,7 +8,10 @@ export const timing = {
   glide: 0.6, // the text glides to the centre, slower than the brackets
   bracketLag: 0.5, // when the text gets shorter, the brackets close this much later
   fade: 0.4, // a phrase fades out in the first 40%, and the next one fades in after it
-  leave: [1.6, 2.2], // seconds after the name starts: the intro fades out and shows Home
+  // Seconds after the name starts:
+  sweep: [1.6, 2.35], // a white bracket rises from the bottom and covers the ink
+  nameOut: [2.7, 3.05], // the name on white fades out
+  leave: [3.15, 3.75], // the white intro fades out and shows Home under it
 }
 
 // Space between the text and each bracket, in pixels.
@@ -92,6 +95,7 @@ export const ease = {
   jump: cubicBezier(0.05, 0.9, 0.1, 1), // brackets: most of the distance in the first frames
   glide: cubicBezier(0.25, 0.8, 0.3, 1), // text: a softer start, so it trails the brackets
   fade: cubicBezier(0.4, 0, 0.2, 1),
+  move: cubicBezier(0.65, 0, 0.35, 1), // sweep: a gentle start and a gentle stop
 }
 
 // Progress from 0 to 1 between `start` and `end`, shaped by a curve.
