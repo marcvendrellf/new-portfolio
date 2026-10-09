@@ -2,11 +2,13 @@ import { intro } from '../content/intro.ts'
 
 // Timing in seconds. Edit these to change the rhythm.
 export const timing = {
+  bracketsIn: 0.3, // the empty brackets fade in
   wordStep: 0.35, // one new word every 350 ms
   jump: 0.45, // one bracket jump
   glide: 0.6, // the text glides to the centre, slower than the brackets
   bracketLag: 0.5, // when the text gets shorter, the brackets close this much later
   fade: 0.4, // a phrase fades out in the first 40%, and the next one fades in after it
+  leave: [1.6, 2.2], // seconds after the name starts: the intro fades out and shows Home
 }
 
 // Space between the text and each bracket, in pixels.
