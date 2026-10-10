@@ -1,12 +1,13 @@
+import { Link } from 'react-router'
 import { sections } from '../content/sections.ts'
 
 function Navbar() {
   return (
-    <nav aria-label="Main" className="flex gap-6">
+    <nav aria-label="Main" className="flex gap-8">
       {Object.values(sections).map((section) => (
-        <a key={section.href} className="whitespace-nowrap" href={section.href}>
+        <Link key={section.href} className="whitespace-nowrap" to={section.href}>
           {section.label}
-        </a>
+        </Link>
       ))}
     </nav>
   )

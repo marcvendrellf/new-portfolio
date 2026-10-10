@@ -1,0 +1,59 @@
+import { useEffect, useState } from 'react'
+
+type CopyButtonProps = {
+  text: string
+}
+
+const copyShape = (
+  <>
+    <rect x="3.5" y="3.5" width="8" height="8" />
+    <path d="M8.5 3.5v-3h-8v8h3" />
+  </>
+)
+
+const checkShape = <path d="M1.5 6.5l3 3 6-7" />
+
+function CopyButton({ text }: CopyButtonProps) {
+  const [copied, setCopied] = useState(false)
+
+  // The check mark shows for 2 seconds. The clean-up stops the timer if the button leaves the page.
+  useEffect(() => {
+    if (!copied) {
+      return
+    }
+    const timer = setTimeout(() => {
+      setCopied(false)
+    }, 2000)
+    return () => clearTimeout(timer)
+  }, [copied])
+
+  async function copyText() {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+    } catch {
+      // The browser can refuse, for example on plain http. Then the icon does not change.
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      aria-label={`Copy ${text}`}
+      onClick={copyText}
+      className="flex h-8 w-4 cursor-pointer items-center justify-center"
+    >
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 12 12"
+        fill="none"
+        stroke="currentColor"
+        className="size-3"
+      >
+        {copied ? checkShape : copyShape}
+      </svg>
+    </button>
+  )
+}
+
+export default CopyButton

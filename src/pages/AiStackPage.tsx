@@ -1,18 +1,32 @@
-import Header from '../components/Header.tsx'
+import CatalogueLayout from '../components/CatalogueLayout.tsx'
+import ListRow from '../components/ListRow.tsx'
+import ListSection from '../components/ListSection.tsx'
+import RowCells from '../components/RowCells.tsx'
 import { aiStack } from '../content/aiStack.ts'
 import { sections } from '../content/sections.ts'
 
 function AiStackPage() {
   return (
-    <>
-      <Header section={sections.aiStack.label} />
-      <main className="page-grid pt-53">
-        <div className="col-span-6">
-          <h1 className="font-title text-title whitespace-pre-line">{aiStack.title}</h1>
-          <p className="mt-8 max-w-[448px]">{aiStack.description}</p>
-        </div>
-      </main>
-    </>
+    <CatalogueLayout
+      section={sections.aiStack.label}
+      title={aiStack.title}
+      description={aiStack.description}
+    >
+      {aiStack.groups.map((group) => (
+        <ListSection key={group.title} title={group.title}>
+          {group.resources.map((resource) => (
+            <ListRow key={resource.id} href={`/ai-stack/${resource.id}`}>
+              <RowCells
+                name={resource.name}
+                kind={resource.kind}
+                detail={resource.summary}
+                arrow="→"
+              />
+            </ListRow>
+          ))}
+        </ListSection>
+      ))}
+    </CatalogueLayout>
   )
 }
 

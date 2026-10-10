@@ -1,8 +1,31 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: Inter;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./assets/fonts/inter-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: Inter;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./assets/fonts/inter-arrows.woff2") format("woff2");
+  unicode-range: U+2190-2193, U+2196-2199;
+}
+
+@font-face {
+  font-family: "Host Grotesk";
+  font-weight: 300 800;
+  font-display: swap;
+  src: url("./assets/fonts/host-grotesk-latin.woff2") format("woff2");
+}
+
 @theme {
   --font-sans: Inter, sans-serif;
   --color-ink: #20201e;
+  --color-paper: #ffffff;
   --text-body: 13px;
   --text-body--line-height: 20px;
   --font-title: "Host Grotesk", sans-serif;
@@ -10,6 +33,10 @@
   --text-title--line-height: 92px;
   --text-title--letter-spacing: -0.03em;
   --text-title--font-weight: 500;
+  --text-hero: 160px;
+  --text-hero--line-height: 154px;
+  --text-hero--letter-spacing: -0.03em;
+  --text-hero--font-weight: 500;
 }
 
 @utility page-grid {
@@ -17,9 +44,14 @@
 }
 
 @layer base {
+  html {
+    overscroll-behavior: none;
+  }
+
   body {
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
     color: var(--color-ink);
+    background-color: var(--color-paper);
   }
 }
