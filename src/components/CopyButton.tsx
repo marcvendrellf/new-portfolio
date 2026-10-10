@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type CopyButtonProps = {
   text: string
@@ -16,12 +16,24 @@ const checkShape = <path d="M1.5 6.5l3 3 6-7" />
 function CopyButton({ text }: CopyButtonProps) {
   const [copied, setCopied] = useState(false)
 
-  async function copyText() {
-    await navigator.clipboard.writeText(text)
-    setCopied(true)
-    setTimeout(() => {
+  // The check mark shows for 2 seconds. The clean-up stops the timer if the button leaves the page.
+  useEffect(() => {
+    if (!copied) {
+      return
+    }
+    const timer = setTimeout(() => {
       setCopied(false)
     }, 2000)
+    return () => clearTimeout(timer)
+  }, [copied])
+
+  async function copyText() {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+    } catch {
+      // The browser can refuse, for example on plain http. Then the icon does not change.
+    }
   }
 
   return (
