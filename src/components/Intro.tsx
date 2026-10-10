@@ -16,12 +16,29 @@ import {
 const storageKey = 'intro-played'
 const clockFormat = new Intl.DateTimeFormat('en-GB', { timeZone: intro.timeZone, timeStyle: 'medium' })
 
+// A browser can block site storage, for example when it blocks all cookies. Then each
+// access throws. The intro treats that as already played, so the page still renders.
+function hasPlayed() {
+  try {
+    return sessionStorage.getItem(storageKey) !== null
+  } catch {
+    return true
+  }
+}
+
+function markPlayed() {
+  try {
+    sessionStorage.setItem(storageKey, 'yes')
+  } catch {
+    // Storage is blocked, so hasPlayed already returns true.
+  }
+}
+
 // The intro plays once per browser tab, only when the first page is Home,
 // and never when the system asks for reduced motion.
 function shouldPlay() {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  const firstTime = sessionStorage.getItem(storageKey) === null
-  return window.location.pathname === '/' && firstTime && !reducedMotion
+  return window.location.pathname === '/' && !hasPlayed() && !reducedMotion
 }
 
 // Move an element with transform only, so the browser does not calculate the layout again.
@@ -102,7 +119,7 @@ function Intro() {
       return
     }
 
-    sessionStorage.setItem(storageKey, 'yes')
+    markPlayed()
     const inkParts = getParts(ink)
     const paperParts = getParts(paper)
     const dots = Array.from(ink.querySelectorAll<HTMLElement>('[data-part="dot"]'))
