@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Link } from 'react-router'
 
 type ListRowProps = {
   href?: string
@@ -20,9 +21,9 @@ function ListRow({ href, target, action, children }: ListRowProps) {
 
   return (
     <li className="relative">
-      <a href={href} target={target} className={rowClassName}>
+      <Link to={href} target={target} className={rowClassName}>
         {children}
-      </a>
+      </Link>
       {action !== undefined && (
         <div className="absolute top-0 right-8">{action}</div>
       )}

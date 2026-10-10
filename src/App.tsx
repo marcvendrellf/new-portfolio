@@ -8,6 +8,7 @@ import ContactPage from './pages/ContactPage.tsx'
 import DirectoryPage from './pages/DirectoryPage.tsx'
 import HackathonPage from './pages/HackathonPage.tsx'
 import HomePage from './pages/HomePage.tsx'
+import NotFoundPage from './pages/NotFoundPage.tsx'
 
 function App() {
   useSmoothScroll()
@@ -25,7 +26,7 @@ function App() {
         <Route path={sections.aiStack.href} element={<AiStackPage />} />
         <Route path={sections.directory.href} element={<DirectoryPage />} />
         <Route path={sections.contact.href} element={<ContactPage />} />
-        <Route path="*" element={<HomePage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
   )
