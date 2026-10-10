@@ -27,6 +27,12 @@ export const bracketGap = 22
 // Distance that a small text rises as it fades in, in pixels.
 export const rise = 8
 
+// Space between the name and the small text under it, in pixels.
+export const textGap = 20
+
+// Space between the text in the middle and the flickering squares, in pixels.
+export const dotMargin = 48
+
 type Step = {
   text: string
   pause: number
@@ -159,15 +165,17 @@ function hash(seed: number) {
   return value - Math.floor(value)
 }
 
-// A flickering square. It jumps to a new place 6 times a second, on a 24 px grid,
-// away from the text in the middle of the screen.
-export function dotState(index: number, t: number, width: number, height: number) {
+// A flickering square. It jumps to a new place 6 times a second, on a 24 px grid.
+// It stays out of a box around the text in the middle of the screen.
+// `keepOut` is half the width and half the height of that box.
+export function dotState(index: number, t: number, width: number, height: number, keepOut: { x: number; y: number }) {
   const step = Math.floor(t * 6)
   const seed = step * 5 + index * 31
   const x = 0.06 * width + hash(seed) * 0.88 * width
   let y = 0.08 * height + hash(seed + 0.37) * 0.84 * height
-  if (Math.abs(y - height / 2) < 110 && Math.abs(x - width / 2) < 440) {
-    y += y < height / 2 ? -160 : 160
+  const fromCenter = y - height / 2
+  if (Math.abs(fromCenter) < keepOut.y && Math.abs(x - width / 2) < keepOut.x) {
+    y += fromCenter < 0 ? -keepOut.y : keepOut.y
   }
 
   return {

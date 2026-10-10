@@ -4,10 +4,12 @@ import {
   bracketGap,
   bracketState,
   buildEvents,
+  dotMargin,
   dotState,
   ease,
   progress,
   rise,
+  textGap,
   timing,
 } from '../lib/introMotion.ts'
 
@@ -134,6 +136,12 @@ function Intro() {
       const [leaveStart, leaveEnd] = afterName(timing.leave)
       const bracketWidth = inkParts.left.offsetWidth
       const lineHeight = word.offsetHeight
+      // Half the size of the box that the squares stay out of: the widest phrase with its brackets,
+      // and the name with the role under it.
+      const keepOut = {
+        x: Math.max(...events.map((event) => event.width)) / 2 + bracketGap + bracketWidth + dotMargin,
+        y: lineHeight / 2 + textGap + inkParts.role.offsetHeight + dotMargin,
+      }
       const startTime = performance.now()
 
       // Draw the intro as it looks at t seconds.
@@ -162,7 +170,7 @@ function Intro() {
         const captionOut = progress(t, leadStart, leadStart + timing.captionOut, ease.fade)
         const roleWords = Math.max(0, Math.floor((t - roleStart) / timing.roleStep) + 1)
         const roleText = intro.role.split(' ').slice(0, roleWords).join(' ')
-        const below = top + lineHeight + 20
+        const below = top + lineHeight + textGap
         const clockText = clockFormat.format(new Date())
 
         const drawCopy = (copy: Parts, opacity: number) => {
@@ -192,7 +200,7 @@ function Intro() {
 
         // The squares show only on ink. The sweep covers them.
         dots.forEach((dot, index) => {
-          const spot = dotState(index, t, width, height)
+          const spot = dotState(index, t, width, height, keepOut)
           dot.style.transform = `translate(${spot.x}px, ${spot.y}px)`
           dot.style.opacity = spot.visible ? '1' : '0'
         })
