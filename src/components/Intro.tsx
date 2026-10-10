@@ -7,10 +7,12 @@ import {
   dotState,
   ease,
   progress,
+  rise,
   timing,
 } from '../lib/introMotion.ts'
 
 const storageKey = 'intro-played'
+const clockFormat = new Intl.DateTimeFormat('en-GB', { timeZone: intro.timeZone, timeStyle: 'medium' })
 
 // The intro plays once per browser tab, only when the first page is Home,
 // and never when the system asks for reduced motion.
@@ -79,7 +81,7 @@ function getParts(copy: HTMLElement): Parts {
     oldWord: get('oldWord'),
     caption: get('caption'),
     role: get('role'),
-    corners: ['topLeft', 'topRight', 'bottomLeft', 'clock'].map(get),
+    corners: ['topLeft', 'topRight', 'bottomLeft'].map(get),
     clock: get('clock'),
   }
 }
@@ -155,13 +157,13 @@ function Intro() {
           newOpacity = progress(t, middle, state.last.time + timing.fade, ease.fade)
         }
 
-        // Small texts rise 8 px and fade in. The caption fades out when the lead phrase starts.
+        // Small texts rise and fade in. The caption fades out when the lead phrase starts.
         const appear = (start: number) => progress(t, start, start + timing.smallIn, ease.open)
-        const captionOut = progress(t, leadStart, leadStart + 0.2, ease.fade)
+        const captionOut = progress(t, leadStart, leadStart + timing.captionOut, ease.fade)
         const roleWords = Math.max(0, Math.floor((t - roleStart) / timing.roleStep) + 1)
         const roleText = intro.role.split(' ').slice(0, roleWords).join(' ')
         const below = top + lineHeight + 20
-        const clockText = new Date().toLocaleTimeString('en-GB', { timeZone: 'Europe/Madrid' })
+        const clockText = clockFormat.format(new Date())
 
         const drawCopy = (copy: Parts, opacity: number) => {
           place(copy.left, centerX - state.frame / 2 - gap - bracketWidth, top, bracketOpacity * opacity)
@@ -172,16 +174,16 @@ function Intro() {
           place(copy.oldWord, centerX - state.previousWidth / 2, top, oldOpacity * opacity)
 
           const caption = appear(captionStart)
-          place(copy.caption, centerX - captionWidth / 2, below + 8 * (1 - caption), 0.5 * caption * (1 - captionOut) * opacity)
+          place(copy.caption, centerX - captionWidth / 2, below + rise * (1 - caption), 0.5 * caption * (1 - captionOut) * opacity)
           const role = appear(roleStart)
           setText(copy.role, roleText)
-          place(copy.role, centerX - roleWidth / 2, below + 8 * (1 - role), role * opacity)
+          place(copy.role, centerX - roleWidth / 2, below + rise * (1 - role), role * opacity)
 
           // CSS places the corner texts, so only their rise and opacity change here.
           const corners = appear(timing.cornersIn)
           setText(copy.clock, clockText)
-          for (const element of copy.corners) {
-            element.style.transform = `translateY(${8 * (1 - corners)}px)`
+          for (const element of [...copy.corners, copy.clock]) {
+            element.style.transform = `translateY(${rise * (1 - corners)}px)`
             element.style.opacity = String(0.5 * corners * opacity)
           }
         }

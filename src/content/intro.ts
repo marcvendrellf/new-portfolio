@@ -7,6 +7,7 @@ type IntroContent = {
   topLeft: string
   topRight: string
   bottomLeft: string
+  timeZone: string
 }
 
 export const intro: IntroContent = {
@@ -18,4 +19,5 @@ export const intro: IntroContent = {
   topLeft: 'Portfolio',
   topRight: '2026',
   bottomLeft: 'Barcelona',
+  timeZone: 'Europe/Madrid',
 }

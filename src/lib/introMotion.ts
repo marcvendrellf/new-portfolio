@@ -5,8 +5,9 @@ export const timing = {
   bracketsIn: 0.3, // the empty brackets fade in
   cornersIn: 0.2, // the corner texts start to appear
   dotsFrom: 0.4, // the flickering squares start
-  smallIn: 0.35, // a small text rises 8 px and fades in
+  smallIn: 0.35, // a small text rises and fades in
   captionDelay: 0.15, // the caption appears this long after the greeting is complete
+  captionOut: 0.2, // the caption fades out when the lead phrase starts
   wordStep: 0.35, // one new word every 350 ms
   jump: 0.45, // one bracket jump
   glide: 0.6, // the text glides to the centre, slower than the brackets
@@ -22,6 +23,9 @@ export const timing = {
 
 // Space between the text and each bracket, in pixels.
 export const bracketGap = 22
+
+// Distance that a small text rises as it fades in, in pixels.
+export const rise = 8
 
 type Step = {
   text: string
