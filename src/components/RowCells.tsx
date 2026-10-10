@@ -1,6 +1,6 @@
 type RowCellsProps = {
   name: string
-  kind: string
+  kind?: string
   detail: string
   arrow: '→' | '↗'
 }

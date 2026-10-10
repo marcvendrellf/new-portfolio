@@ -25,7 +25,6 @@ function ContactPage() {
             >
               <RowCells
                 name={contact.email.name}
-                kind=""
                 detail={contact.email.address}
                 arrow="↗"
               />
@@ -34,7 +33,6 @@ function ContactPage() {
               <ListRow key={profile.url} href={profile.url} target="_blank">
                 <RowCells
                   name={profile.name}
-                  kind=""
                   detail={profile.detail}
                   arrow="↗"
                 />
