@@ -113,7 +113,13 @@ function Intro() {
         word.textContent = text
         return word.offsetWidth
       })
-      const timeOf = (text: string) => events.find((event) => event.text === text)?.time ?? 0
+      const timeOf = (text: string) => {
+        const event = events.find((item) => item.text === text)
+        if (!event) {
+          throw new Error(`The intro script has no "${text}" phrase.`)
+        }
+        return event.time
+      }
       const nameStart = timeOf(intro.name)
       const captionStart = timeOf(intro.greeting) + timing.captionDelay
       const leadStart = timeOf(intro.lead)
@@ -128,8 +134,8 @@ function Intro() {
       const lineHeight = word.offsetHeight
       const startTime = performance.now()
 
-      const draw = (now: number) => {
-        const t = (now - startTime) / 1000
+      // Draw the intro as it looks at t seconds.
+      const drawFrame = (t: number) => {
         const state = bracketState(events, t)
         const width = window.innerWidth
         const height = window.innerHeight
@@ -200,6 +206,17 @@ function Intro() {
 
         // The white intro fades out and shows Home under it.
         overlay.style.opacity = String(1 - progress(t, leaveStart, leaveEnd, ease.fade))
+      }
+
+      const draw = (now: number) => {
+        const t = (now - startTime) / 1000
+        try {
+          drawFrame(t)
+        } catch (error) {
+          // Close the intro, so it does not cover Home. The error still shows in the console.
+          setPlaying(false)
+          throw error
+        }
         if (t >= leaveEnd) {
           setPlaying(false)
           return
@@ -210,12 +227,20 @@ function Intro() {
       frameId = requestAnimationFrame(draw)
     }
 
-    // Widths are correct only with the real font, so wait for it.
-    document.fonts.load('500 88px "Host Grotesk"').then(() => {
-      if (!stopped) {
-        start()
-      }
-    })
+    // Widths are correct only with the real fonts, so wait for both.
+    Promise.all([
+      document.fonts.load('500 88px "Host Grotesk"'),
+      document.fonts.load('20px Inter'),
+    ])
+      .then(() => {
+        if (!stopped) {
+          start()
+        }
+      })
+      .catch((error) => {
+        setPlaying(false)
+        throw error
+      })
 
     return () => {
       stopped = true
